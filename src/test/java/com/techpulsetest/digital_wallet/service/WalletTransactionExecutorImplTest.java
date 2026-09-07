@@ -3,6 +3,7 @@ package com.techpulsetest.digital_wallet.service;
 import com.techpulsetest.digital_wallet.dto.request.DepositRequestDto;
 import com.techpulsetest.digital_wallet.dto.request.TransferRequestDto;
 import com.techpulsetest.digital_wallet.dto.response.TransactionResponseDto;
+import com.techpulsetest.digital_wallet.entity.Transaction;
 import com.techpulsetest.digital_wallet.entity.User;
 import com.techpulsetest.digital_wallet.entity.Wallet;
 import com.techpulsetest.digital_wallet.exceptions.InsufficientBalanceException;
@@ -73,7 +74,6 @@ class WalletTransactionExecutorImplTest {
         TransactionResponseDto existingResponse = TransactionResponseDto.builder().transactionId(99).build();
 
         when(transactionService.findByIdempotencyKey("idem-dep-1")).thenReturn(Optional.of(existingResponse));
-        when(walletRepository.findByUser_Id(1)).thenReturn(Optional.of(senderWallet));
 
         TransactionResponseDto response = executor.executeDeposit(1, "idem-dep-1", request);
 

@@ -72,8 +72,8 @@ class WalletTransactionExecutorImplTest {
         DepositRequestDto request = new DepositRequestDto();
         TransactionResponseDto existingResponse = TransactionResponseDto.builder().transactionId(99).build();
 
-        // Idempotency check happens first; wallet lookup shouldn't block it if duplicate is found
         when(transactionService.findByIdempotencyKey("idem-dep-1")).thenReturn(Optional.of(existingResponse));
+        when(walletRepository.findByUser_Id(1)).thenReturn(Optional.of(senderWallet));
 
         TransactionResponseDto response = executor.executeDeposit(1, "idem-dep-1", request);
 

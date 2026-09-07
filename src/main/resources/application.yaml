@@ -1,0 +1,32 @@
+server:
+  port: 8020
+
+spring:
+  application:
+    name: digital-wallet
+
+  datasource:
+    url: jdbc:h2:mem:digital_wallet_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  secret: ${JWT_SECRET:defaultSecretKeyThatIsAtLeast256BitsLongForHmacShaKeyForSafety}
+  expiration: ${JWT_EXPIRATION:3600000}

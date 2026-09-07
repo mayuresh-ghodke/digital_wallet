@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -23,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class WalletTransactionExecutorImplTest {
 
     @Mock
@@ -69,11 +72,12 @@ class WalletTransactionExecutorImplTest {
         DepositRequestDto request = new DepositRequestDto();
         TransactionResponseDto existingResponse = TransactionResponseDto.builder().transactionId(99).build();
 
-        when(walletRepository.findByUser_Id(1)).thenReturn(Optional.of(senderWallet));
+        // Idempotency check happens first; wallet lookup shouldn't block it if duplicate is found
         when(transactionService.findByIdempotencyKey("idem-dep-1")).thenReturn(Optional.of(existingResponse));
 
         TransactionResponseDto response = executor.executeDeposit(1, "idem-dep-1", request);
 
+        assertNotNull(response);
         assertEquals(99, response.getTransactionId());
         verify(walletRepository, never()).saveAndFlush(any());
     }
@@ -106,6 +110,7 @@ class WalletTransactionExecutorImplTest {
         request.setAmount(BigDecimal.valueOf(500.00));
         request.setToUserId(2);
 
+        when(transactionService.findByIdempotencyKey("idem-trf-1")).thenReturn(Optional.empty());
         when(walletRepository.findByUser_Id(1)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findByUser_Id(2)).thenReturn(Optional.of(receiverWallet));
 

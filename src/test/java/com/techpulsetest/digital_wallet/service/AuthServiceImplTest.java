@@ -105,12 +105,12 @@ class AuthServiceImplTest {
         request.setEmail("user@example.com");
         request.setPassword("password123");
 
-        User user = new User();
-        user.setEmail("user@example.com");
-        user.setPassword("encodedPassword");
-        user.setRole(Role.USER);
+        User testUser = new User();
+        testUser.setEmail("user@example.com");
+        testUser.setPassword("encodedPassword");
+        testUser.setRole(Role.USER);
 
-        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
         when(jwtUtils.generateToken(any())).thenReturn("mock-jwt-token");
 
         AuthResponseDto response = authService.login(request);

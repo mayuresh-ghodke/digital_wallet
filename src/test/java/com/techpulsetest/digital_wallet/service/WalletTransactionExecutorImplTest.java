@@ -3,7 +3,6 @@ package com.techpulsetest.digital_wallet.service;
 import com.techpulsetest.digital_wallet.dto.request.DepositRequestDto;
 import com.techpulsetest.digital_wallet.dto.request.TransferRequestDto;
 import com.techpulsetest.digital_wallet.dto.response.TransactionResponseDto;
-import com.techpulsetest.digital_wallet.entity.Transaction;
 import com.techpulsetest.digital_wallet.entity.User;
 import com.techpulsetest.digital_wallet.entity.Wallet;
 import com.techpulsetest.digital_wallet.exceptions.InsufficientBalanceException;
@@ -55,7 +54,6 @@ class WalletTransactionExecutorImplTest {
         DepositRequestDto request = new DepositRequestDto();
         request.setAmount(BigDecimal.valueOf(50.00));
 
-        when(transactionService.findByIdempotencyKey("idem-dep-1")).thenReturn(Optional.empty());
         when(walletRepository.findByUser_Id(1)).thenReturn(Optional.of(senderWallet));
         when(transactionService.saveTransaction(any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(TransactionResponseDto.builder().transactionId(1).build());
@@ -69,26 +67,11 @@ class WalletTransactionExecutorImplTest {
     }
 
     @Test
-    void executeDeposit_IdempotentDuplicate_ReturnsExisting() {
-        DepositRequestDto request = new DepositRequestDto();
-        TransactionResponseDto existingResponse = TransactionResponseDto.builder().transactionId(99).build();
-
-        when(transactionService.findByIdempotencyKey("idem-dep-1")).thenReturn(Optional.of(existingResponse));
-
-        TransactionResponseDto response = executor.executeDeposit(1, "idem-dep-1", request);
-
-        assertNotNull(response);
-        assertEquals(99, response.getTransactionId());
-        verify(walletRepository, never()).saveAndFlush(any());
-    }
-
-    @Test
     void executeTransfer_Success() {
         TransferRequestDto request = new TransferRequestDto();
         request.setAmount(BigDecimal.valueOf(40.00));
         request.setToUserId(2);
 
-        when(transactionService.findByIdempotencyKey("idem-trf-1")).thenReturn(Optional.empty());
         when(walletRepository.findByUser_Id(1)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findByUser_Id(2)).thenReturn(Optional.of(receiverWallet));
         when(transactionService.saveTransaction(any(), any(), any(), any(), any(), any(), any()))
@@ -110,7 +93,6 @@ class WalletTransactionExecutorImplTest {
         request.setAmount(BigDecimal.valueOf(500.00));
         request.setToUserId(2);
 
-        when(transactionService.findByIdempotencyKey("idem-trf-1")).thenReturn(Optional.empty());
         when(walletRepository.findByUser_Id(1)).thenReturn(Optional.of(senderWallet));
         when(walletRepository.findByUser_Id(2)).thenReturn(Optional.of(receiverWallet));
 

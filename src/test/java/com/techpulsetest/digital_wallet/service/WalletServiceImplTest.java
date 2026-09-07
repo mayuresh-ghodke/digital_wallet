@@ -51,6 +51,21 @@ class WalletServiceImplTest {
     }
 
     @Test
+    void depositAmount_IdempotentDuplicate_ReturnsExisting() {
+        DepositRequestDto request = new DepositRequestDto();
+        request.setAmount(BigDecimal.valueOf(50.00));
+        TransactionResponseDto existingResponse = TransactionResponseDto.builder().transactionId(99).build();
+
+        when(transactionService.findByIdempotencyKey("idem-dep-1")).thenReturn(Optional.of(existingResponse));
+
+        TransactionResponseDto response = walletService.depositAmount(1, "idem-dep-1", request);
+
+        assertNotNull(response);
+        assertEquals(99, response.getTransactionId());
+        verify(walletTransactionExecutor, never()).executeDeposit(any(), any(), any());
+    }
+
+    @Test
     void getWalletByUserId_Success() {
         when(walletRepository.findByUser_Id(1)).thenReturn(Optional.of(wallet));
 

@@ -206,6 +206,6 @@ mvn clean verify sonar:sonar \
 - All monetary amounts use `BigDecimal(precision=19, scale=4)` to avoid floating-point rounding errors.
 - Idempotency keys are supplied by the **client** (typically a UUID generated per logical operation) and are unique per transaction attempt, not per user.
 - `ddl-auto: update` and H2 are used.
-- There is no public API endpoint to create an `ADMIN` user — `/auth/register` only ever creates `USER` role accounts, by design, to avoid exposing privilege escalation via the API. For local testing/demo purposes, an `ADMIN` user is seeded manually via a direct SQL `INSERT` (through the H2 console) rather than through the registration API. In a production system this would instead be handled through a separate, tightly-controlled admin-provisioning process.
-** SQL Insert Query: 
-INSERT INTO users (email, password, role) VALUES ('admin@example.com', '$2b$10$OZvhY8sBVRkfMk./jAy7Tu.bt9ht7Zoz5xepzJVhwIcvH5oE65Rw6', 'ADMIN');
+- There is no public API endpoint to create an `ADMIN` user — `/auth/register` only ever creates `USER` role accounts, by design, to avoid exposing privilege escalation via the API.
+- For local testing/demo purposes, an `ADMIN` user is seeded manually via a direct SQL `INSERT` (through the H2 console) rather than through the registration API. In a production system this would instead be handled through a separate, tightly-controlled admin-provisioning process.
+  SQL Insert Query for Admin: ```INSERT INTO users (email, password, role) VALUES ('admin@example.com', '$2b$10$OZvhY8sBVRkfMk./jAy7Tu.bt9ht7Zoz5xepzJVhwIcvH5oE65Rw6', 'ADMIN');```
